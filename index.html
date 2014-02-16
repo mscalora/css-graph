@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Graph</title>
+    <script type='text/javascript' src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script type='text/javascript' src="jquery.shshake.js"></script>
+    <style>
+        html, body, div { margin: 0; padding: 0; }
+        html {
+            width: 100%;
+            height: 100%;
+            background: black;
+        }
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        div {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+        }
+        span {
+            top: -50%;
+            left: -50%;
+            color: gray;
+            position: absolute;
+            display: block;
+            z-index: 0;
+        }
+        span.highlight {
+            z-index: 1;
+            color: red;
+            font-weight: bolder;
+            text-shadow: 0px 0px 2px yellow;
+        }
+    </style>
+</head>
+<body>
+    <div>
+    <span class="highlight">&#8658;</span>
+    </div>
+</body>
+<!-- &rarr; &#8608; -->
+<script>
+    var n = 0.0001,
+        e = Math.PI*6,
+        s = 150,
+        q = e/350,
+        px = null,
+        py = null,
+        span = $('span'),
+        idealx = 1250,
+        idealy = 950;
+    var offx = span.width()/ 2,
+        offy = span.height()/ 2;
+
+    var ideal = idealx/idealy;
+    var ratio = $(window).width()/$(window).height();
+
+    if (ratio<ideal) {
+        zoom = $(window).width()/idealx
+        s = 150*zoom;
+    } else {
+        zoom = $(window).height()/idealy;
+        s = 150*zoom;
+    }
+
+    var action = function(){};
+
+    var timer = setInterval(function(){action();},20);
+
+    var highlight = function(){
+        var it = $('.highlight').removeClass('highlight').next().addClass('highlight');
+        if (it.length===0) {
+            $('span:first').addClass('highlight')
+        }
+    };
+
+    var render = function(){
+        var x = 4 * Math.sin(2/3*n);
+        var y = 3 * Math.sin(n);
+        if (px===null) {
+            px = 4 * Math.sin(2/3*(n-q));
+            py = 3 * Math.sin(n-q);
+        }
+        var a = Math.atan2(y-py,x-px);
+        var v = 'translate('+(x*s-offx)+'px,'+(y*s-offy)+'px) rotate('+a+'rad) ';
+        span.css({
+                transform: v,
+                '-webkit-transform' : v
+            })
+            .clone()
+            .removeClass('highlight')
+            .attr('title',Math.round(n/Math.PI*1000)/1000)
+            .appendTo(span.parent());
+        px = x;
+        py = y;
+        n+=q;
+        if (n>e) {
+            action = highlight;
+            return;
+        }
+    };
+    action = render;
+
+</script>
+</html>
